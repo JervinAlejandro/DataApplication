@@ -16,5 +16,15 @@ namespace DataApplication
         {
             InitializeComponent();
         }
+
+        List<Information> list = new List<Information>();
+
+        #region Buttons
+        private void buttonAdd_Click(object sender, EventArgs e)
+        {
+
+        }
+
+       
     }
 }
