@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 
 namespace DataApplication
 {
+    [Serializable()]
     class Information : IComparable<Information>
     {
         private string name;
@@ -44,6 +45,11 @@ namespace DataApplication
         public void setDefinition(String definition)
         {
             this.definition = definition;
+        }
+
+        public string DisplayInfos()
+        {
+            return getName() + getCategory() + getDefinition() + getStructure();
         }
         public int CompareTo(Information other)
         {
