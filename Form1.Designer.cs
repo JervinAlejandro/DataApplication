@@ -167,6 +167,7 @@
             this.radioButtonLinear.TabStop = true;
             this.radioButtonLinear.Text = "Linear";
             this.radioButtonLinear.UseVisualStyleBackColor = true;
+            this.radioButtonLinear.CheckedChanged += new System.EventHandler(this.radioButtonLinear_CheckedChanged_1);
             // 
             // label3
             // 

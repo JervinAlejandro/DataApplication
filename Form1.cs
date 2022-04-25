@@ -23,6 +23,7 @@ namespace DataApplication
         List<Information> wiki = new List<Information>();
         string[] category = { "Array", "List", "Tree", "Graphs", "Abstract", "Hash" };
         Information addNewInformation;
+        string option = null;
 
         private void Form1_Load(object sender, EventArgs e)
         {
@@ -46,7 +47,7 @@ namespace DataApplication
             {
                 var result = MessageBox.Show("Ensure that every attributes are filled", "ERROR", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
-            else if(ValidName() == false)
+            else if(validName() == false)
             {
                 var result = MessageBox.Show("Name already exist", "ERROR", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
@@ -56,47 +57,71 @@ namespace DataApplication
                 addNewInformation.setName(textBoxName.Text);
                 addNewInformation.setCategory(comboBoxCategory.Text);
                 addNewInformation.setDefinition(textBoxDefinition.Text);
-
-                if (radioButtonLinear.Checked)
-                {
-                    addNewInformation.setStructure(radioButtonLinear.Text);
-                }
-                else
-                {
-                    addNewInformation.setStructure(radioButtonNonLinear.Text);
-                }
-
+                addNewInformation.setStructure(option);
                 wiki.Add(addNewInformation);
                 toolStripStatusLabel1.Text = "Add Success";
                 clearTextBox();
             }
-            wiki.Sort();
+            sortList();
             display();
         }
 
         private void buttonEdit_Click(object sender, EventArgs e)
         {
-
+            try
+            {
+                int currentSelect = listView1.SelectedIndices[0];
+                if (checkEmpty() == true)
+                {
+                    var result = MessageBox.Show("Ensure that every attributes are filled", "ERROR", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
+                else if (!wiki[currentSelect].getName().Equals(textBoxName.Text) && validName() == false)
+                {
+                    var result = MessageBox.Show("Name already exist", "ERROR", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
+                else
+                {
+                    wiki[currentSelect].setName(textBoxName.Text);
+                    wiki[currentSelect].setCategory(comboBoxCategory.Text);
+                    wiki[currentSelect].setDefinition(textBoxDefinition.Text);
+                    wiki[currentSelect].setStructure(option);
+                    toolStripStatusLabel1.Text = "Edit Success";
+                    clearTextBox();
+                    display();
+                }
+            }
+            catch(System.ArgumentOutOfRangeException ex)
+            {
+                var result = MessageBox.Show("No data is selected", "ERROR", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
         }
 
         private void buttonDelete_Click(object sender, EventArgs e)
         {
-            int currentSelect = listView1.SelectedIndices[0];
-            var result = MessageBox.Show("Are you sure you want to delete \"" 
-                + wiki[currentSelect].getName() + "\"?", "Question", MessageBoxButtons.YesNo, 
-                MessageBoxIcon.Question);
-            if(result == DialogResult.Yes)
+            try
             {
-                wiki.RemoveAt(currentSelect);
-                toolStripStatusLabel1.Text = "Delete Success";
-                clearTextBox();
-                display();
+                int currentSelect = listView1.SelectedIndices[0];
+                var result = MessageBox.Show("Are you sure you want to delete \""
+                    + wiki[currentSelect].getName() + "\"?", "Question", MessageBoxButtons.YesNo,
+                    MessageBoxIcon.Question);
+                if (result == DialogResult.Yes)
+                {
+                    wiki.RemoveAt(currentSelect);
+                    toolStripStatusLabel1.Text = "Delete Success";
+                    clearTextBox();
+                    display();
+                }
+                else
+                {
+                    toolStripStatusLabel1.Text = "Delete Cancelled";
+                    clearTextBox();
+                }
             }
-            else
+            catch(System.ArgumentOutOfRangeException ex)
             {
-                toolStripStatusLabel1.Text = "Delete Cancelled";
-                clearTextBox();
+                var result = MessageBox.Show("No data is selected", "ERROR", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
+
         }
 
         private void buttonSearch_Click(object sender, EventArgs e)
@@ -132,13 +157,12 @@ namespace DataApplication
             openBin.Filter = "Bin|*.bin";
             openBin.Title = "Open Bin File";
             openBin.InitialDirectory = Application.StartupPath;
-
             if (openBin.ShowDialog() == DialogResult.OK)
             {
                 open(openBin.FileName);
                 MessageBox.Show("Open Success");
-                display();
                 clearTextBox();
+                display();
             }
             else
             {
@@ -152,7 +176,8 @@ namespace DataApplication
         {
             if(string.IsNullOrWhiteSpace(textBoxName.Text) || 
                 string.IsNullOrWhiteSpace(textBoxDefinition.Text) ||
-                string.IsNullOrWhiteSpace(comboBoxCategory.Text))
+                string.IsNullOrWhiteSpace(comboBoxCategory.Text) || 
+                (!radioButtonLinear.Checked && !radioButtonNonLinear.Checked))
             {
                 return true;
             }
@@ -185,8 +210,7 @@ namespace DataApplication
             textBoxName.Text = wiki[currentRecord].getName();
             comboBoxCategory.Text = wiki[currentRecord].getCategory();
             textBoxDefinition.Text = wiki[currentRecord].getDefinition();
-
-            if(getRadioIndex() == 0)
+            if(wiki[currentRecord].getStructure() == "Linear")
             {
                 radioButtonLinear.Checked = true;
             }
@@ -200,17 +224,19 @@ namespace DataApplication
         {
             if (radioButtonLinear.Checked)
             {
-                return radioButtonLinear.Text;
+                option = radioButtonLinear.Text;
+                return option;
             }
             else
             {
-                return radioButtonNonLinear.Text;
+                option = radioButtonNonLinear.Text;
+                return option;
             }
         }
 
         private int getRadioIndex()
         {
-            if (radioButtonLinear.Checked)
+            if (option == "Linear")
             {
                 return 0;
             }
@@ -219,7 +245,13 @@ namespace DataApplication
                 return 1;
             }
         }
-        private bool ValidName()
+        private void radioButtonLinear_CheckedChanged_1(object sender, EventArgs e)
+        {
+            getRadioBox();
+            getRadioIndex();
+        }
+
+        private bool validName()
         {
             foreach(var information in wiki)
             {
@@ -238,7 +270,7 @@ namespace DataApplication
                 using (Stream stream = File.Open(saveName, FileMode.Create))
                 {
                     BinaryFormatter bin = new BinaryFormatter();
-                    foreach(var info in wiki)
+                    foreach(Information info in wiki)
                     {
                         bin.Serialize(stream, info);
                     }
@@ -256,7 +288,7 @@ namespace DataApplication
                 using (Stream stream = File.Open(openName, FileMode.Open))
                 {
                     BinaryFormatter bin = new BinaryFormatter();
-                    foreach(var info in wiki)
+                    foreach(Information info in wiki)
                     {
                         wiki = (List<Information>)bin.Deserialize(stream);
                     }
@@ -268,8 +300,42 @@ namespace DataApplication
             }
         }
 
+        private void sortList()
+        {
+            string temp;
+            string temp1;
+            string temp2;
+            string temp3;
+            for (int x = 0; x < wiki.Count; x++)
+            {
+                for (int y = x + 1; y < wiki.Count; y++)
+                {
+                    if (wiki[x].getName().CompareTo(wiki[y].getName()) > 0)
+                    {
+                        temp = wiki[x].getName();
+                        temp1 = wiki[x].getCategory();
+                        temp2 = wiki[x].getStructure();
+                        temp3 = wiki[x].getDefinition();
+
+                        wiki[x].setName(wiki[y].getName());
+                        wiki[x].setCategory(wiki[y].getCategory());
+                        wiki[x].setStructure(wiki[y].getStructure());
+                        wiki[x].setDefinition(wiki[y].getDefinition());
+
+                        wiki[y].setName(temp);
+                        wiki[y].setCategory(temp1);
+                        wiki[y].setStructure(temp2);
+                        wiki[y].setDefinition(temp3);
+
+
+                    }
+                }
+            }
+        }
+
+
         #endregion
 
-
+        
     }
 }
