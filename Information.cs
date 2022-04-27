@@ -47,13 +47,27 @@ namespace DataApplication
             this.definition = definition;
         }
 
-        public string DisplayInfos()
-        {
-            return getName() + getCategory() + getDefinition() + getStructure();
-        }
         public int CompareTo(Information other)
         {
             return this.name.CompareTo(other.name);
+        }
+        public int Compare(Information info, String textbox)
+        {
+            if (info.getName() == textbox)
+            {
+                return 0;
+            }
+            if (info == null) 
+            { 
+                return -1; 
+            }
+            
+            if (textbox == null)
+            {
+                return 1;
+            }
+
+            return String.Compare(info.getName(), textbox);
         }
     }
 }

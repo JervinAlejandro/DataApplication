@@ -152,19 +152,16 @@
             this.radioButtonNonLinear.Name = "radioButtonNonLinear";
             this.radioButtonNonLinear.Size = new System.Drawing.Size(77, 17);
             this.radioButtonNonLinear.TabIndex = 14;
-            this.radioButtonNonLinear.TabStop = true;
             this.radioButtonNonLinear.Text = "Non-Linear";
             this.radioButtonNonLinear.UseVisualStyleBackColor = true;
             // 
             // radioButtonLinear
             // 
             this.radioButtonLinear.AutoSize = true;
-            this.radioButtonLinear.Checked = true;
             this.radioButtonLinear.Location = new System.Drawing.Point(9, 25);
             this.radioButtonLinear.Name = "radioButtonLinear";
             this.radioButtonLinear.Size = new System.Drawing.Size(54, 17);
             this.radioButtonLinear.TabIndex = 13;
-            this.radioButtonLinear.TabStop = true;
             this.radioButtonLinear.Text = "Linear";
             this.radioButtonLinear.UseVisualStyleBackColor = true;
             this.radioButtonLinear.CheckedChanged += new System.EventHandler(this.radioButtonLinear_CheckedChanged_1);
@@ -192,8 +189,8 @@
             this.columnHeader1,
             this.columnHeader2});
             this.listView1.FullRowSelect = true;
-            this.listView1.HideSelection = false;
             this.listView1.Location = new System.Drawing.Point(197, 56);
+            this.listView1.MultiSelect = false;
             this.listView1.Name = "listView1";
             this.listView1.Size = new System.Drawing.Size(312, 350);
             this.listView1.TabIndex = 15;

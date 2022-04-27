@@ -24,6 +24,7 @@ namespace DataApplication
         string[] category = { "Array", "List", "Tree", "Graphs", "Abstract", "Hash" };
         Information addNewInformation;
         string option = null;
+        int temp1;
 
         private void Form1_Load(object sender, EventArgs e)
         {
@@ -81,10 +82,7 @@ namespace DataApplication
                 }
                 else
                 {
-                    wiki[currentSelect].setName(textBoxName.Text);
-                    wiki[currentSelect].setCategory(comboBoxCategory.Text);
-                    wiki[currentSelect].setDefinition(textBoxDefinition.Text);
-                    wiki[currentSelect].setStructure(option);
+                    showTextBox("set", currentSelect);
                     toolStripStatusLabel1.Text = "Edit Success";
                     clearTextBox();
                     display();
@@ -119,14 +117,40 @@ namespace DataApplication
             }
             catch(System.ArgumentOutOfRangeException ex)
             {
-                var result = MessageBox.Show("No data is selected", "ERROR", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                var result = MessageBox.Show("No data is selected", "ERROR", 
+                    MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
 
         }
 
         private void buttonSearch_Click(object sender, EventArgs e)
         {
-
+            Information temp = new Information();
+            temp.setName(textBoxSearch.Text);
+            int test = wiki.BinarySearch(temp);
+            if (!string.IsNullOrWhiteSpace(textBoxSearch.Text))
+            {
+                if (test != -1)
+                {
+                    toolStripStatusLabel1.Text = "Data Found";
+                    listView1.Focus();
+                    listView1.Items[test].Selected = true;
+                    showTextBox("get", test);
+                }
+                else
+                {
+                    var result = MessageBox.Show("Data not found", "Information",
+                       MessageBoxButtons.OK, MessageBoxIcon.Information);
+                }
+            }
+            else
+            {
+                var result = MessageBox.Show("TextBox is empty", "ERROR",
+                       MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+            
+            
+            textBoxSearch.Clear();
         }
 
         private void buttonSave_Click(object sender, EventArgs e)
@@ -174,9 +198,10 @@ namespace DataApplication
         #region functions
         private bool checkEmpty()
         {
-            if(string.IsNullOrWhiteSpace(textBoxName.Text) || 
+            if (string.IsNullOrWhiteSpace(textBoxName.Text) ||
                 string.IsNullOrWhiteSpace(textBoxDefinition.Text) ||
-                string.IsNullOrWhiteSpace(comboBoxCategory.Text) || 
+                string.IsNullOrWhiteSpace(comboBoxCategory.Text) ||
+                
                 (!radioButtonLinear.Checked && !radioButtonNonLinear.Checked))
             {
                 return true;
@@ -195,29 +220,48 @@ namespace DataApplication
                 lvi.SubItems.Add(info.getCategory());
                 listView1.Items.Add(lvi);
             }
+            
+        }
+
+        private void showTextBox(string text, int index)
+        {
+            if(text == "set")
+            {
+                wiki[index].setName(textBoxName.Text);
+                wiki[index].setCategory(comboBoxCategory.Text);
+                wiki[index].setDefinition(textBoxDefinition.Text);
+                wiki[index].setStructure(option);
+            }
+
+            if(text == "get")
+            {
+                textBoxName.Text = wiki[index].getName();
+                comboBoxCategory.Text = wiki[index].getCategory();
+                textBoxDefinition.Text = wiki[index].getDefinition();
+                if (wiki[index].getStructure() == "Linear")
+                {
+                    radioButtonLinear.Checked = true;
+                }
+                else
+                {
+                    radioButtonNonLinear.Checked = true;
+                }
+            }
+            
         }
         private void clearTextBox()
         {
             textBoxName.Text = string.Empty;
             textBoxDefinition.Text = string.Empty;
             comboBoxCategory.Text = category[0];
-            radioButtonLinear.Checked = true;
+            radioButtonLinear.Checked = false;
+            radioButtonNonLinear.Checked = false;
         }
 
         private void listView1_Click(object sender, EventArgs e)
         {
             int currentRecord = listView1.SelectedIndices[0];
-            textBoxName.Text = wiki[currentRecord].getName();
-            comboBoxCategory.Text = wiki[currentRecord].getCategory();
-            textBoxDefinition.Text = wiki[currentRecord].getDefinition();
-            if(wiki[currentRecord].getStructure() == "Linear")
-            {
-                radioButtonLinear.Checked = true;
-            }
-            else
-            {
-                radioButtonNonLinear.Checked = true;
-            }
+            showTextBox("get", currentRecord);
         }
 
         private string getRadioBox()
@@ -333,9 +377,8 @@ namespace DataApplication
             }
         }
 
-
         #endregion
 
-        
+
     }
 }
