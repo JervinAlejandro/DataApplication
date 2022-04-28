@@ -1,13 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
 using System.IO;
-using System.Linq;
 using System.Runtime.Serialization.Formatters.Binary;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace DataApplication
@@ -22,10 +16,9 @@ namespace DataApplication
 
         List<Information> wiki = new List<Information>();
         string[] category = { "Array", "List", "Tree", "Graphs", "Abstract", "Hash" };
-        Information addNewInformation;
         string option = null;
-        int temp1;
 
+        #region FormLoad
         private void Form1_Load(object sender, EventArgs e)
         {
             comboBoxCategory.Items.AddRange(category);
@@ -33,13 +26,16 @@ namespace DataApplication
             if(File.Exists("default.bin") == true)
             {
                 open("default.bin");
+                var result = MessageBox.Show("Default.bin successfully loaded", "Information", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
             display();
         }
         private void Form1_FormClosed(object sender, FormClosedEventArgs e)
         {
             save("default.bin");
+            var result = MessageBox.Show("Data Automatically saved to Default.bin", "Information", MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
+        #endregion
 
         #region Buttons
         private void buttonAdd_Click(object sender, EventArgs e)
@@ -54,7 +50,7 @@ namespace DataApplication
             }
             else
             {
-                addNewInformation = new Information();
+                Information addNewInformation = new Information();
                 addNewInformation.setName(textBoxName.Text);
                 addNewInformation.setCategory(comboBoxCategory.Text);
                 addNewInformation.setDefinition(textBoxDefinition.Text);
@@ -66,7 +62,6 @@ namespace DataApplication
             sortList();
             display();
         }
-
         private void buttonEdit_Click(object sender, EventArgs e)
         {
             try
@@ -93,7 +88,6 @@ namespace DataApplication
                 var result = MessageBox.Show("No data is selected", "ERROR", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
-
         private void buttonDelete_Click(object sender, EventArgs e)
         {
             try
@@ -122,7 +116,6 @@ namespace DataApplication
             }
 
         }
-
         private void buttonSearch_Click(object sender, EventArgs e)
         {
             Information temp = new Information();
@@ -130,7 +123,7 @@ namespace DataApplication
             int test = wiki.BinarySearch(temp);
             if (!string.IsNullOrWhiteSpace(textBoxSearch.Text))
             {
-                if (test != -1)
+                if (test > -1)
                 {
                     toolStripStatusLabel1.Text = "Data Found";
                     listView1.Focus();
@@ -140,7 +133,8 @@ namespace DataApplication
                 else
                 {
                     var result = MessageBox.Show("Data not found", "Information",
-                       MessageBoxButtons.OK, MessageBoxIcon.Information);
+                           MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    clearTextBox();
                 }
             }
             else
@@ -148,11 +142,9 @@ namespace DataApplication
                 var result = MessageBox.Show("TextBox is empty", "ERROR",
                        MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
-            
-            
+
             textBoxSearch.Clear();
         }
-
         private void buttonSave_Click(object sender, EventArgs e)
         {
             SaveFileDialog saveBin = new SaveFileDialog();
@@ -174,7 +166,6 @@ namespace DataApplication
                 MessageBox.Show("Save Success");
             }
         }
-
         private void buttonOpen_Click(object sender, EventArgs e)
         {
             OpenFileDialog openBin = new OpenFileDialog();
@@ -184,9 +175,9 @@ namespace DataApplication
             if (openBin.ShowDialog() == DialogResult.OK)
             {
                 open(openBin.FileName);
-                MessageBox.Show("Open Success");
                 clearTextBox();
                 display();
+                MessageBox.Show("Open Success");
             }
             else
             {
@@ -222,7 +213,6 @@ namespace DataApplication
             }
             
         }
-
         private void showTextBox(string text, int index)
         {
             if(text == "set")
@@ -247,7 +237,6 @@ namespace DataApplication
                     radioButtonNonLinear.Checked = true;
                 }
             }
-            
         }
         private void clearTextBox()
         {
@@ -257,13 +246,11 @@ namespace DataApplication
             radioButtonLinear.Checked = false;
             radioButtonNonLinear.Checked = false;
         }
-
         private void listView1_Click(object sender, EventArgs e)
         {
             int currentRecord = listView1.SelectedIndices[0];
             showTextBox("get", currentRecord);
         }
-
         private string getRadioBox()
         {
             if (radioButtonLinear.Checked)
@@ -277,7 +264,6 @@ namespace DataApplication
                 return option;
             }
         }
-
         private int getRadioIndex()
         {
             if (option == "Linear")
@@ -294,7 +280,6 @@ namespace DataApplication
             getRadioBox();
             getRadioIndex();
         }
-
         private bool validName()
         {
             foreach(var information in wiki)
@@ -306,7 +291,6 @@ namespace DataApplication
             }
             return true;
         }
-
         private void save(string saveName)
         {
             try
@@ -314,10 +298,7 @@ namespace DataApplication
                 using (Stream stream = File.Open(saveName, FileMode.Create))
                 {
                     BinaryFormatter bin = new BinaryFormatter();
-                    foreach(Information info in wiki)
-                    {
-                        bin.Serialize(stream, info);
-                    }
+                    bin.Serialize(stream, wiki);
                 }
             }
             catch (IOException ex)
@@ -332,18 +313,17 @@ namespace DataApplication
                 using (Stream stream = File.Open(openName, FileMode.Open))
                 {
                     BinaryFormatter bin = new BinaryFormatter();
-                    foreach(Information info in wiki)
+                    while (stream.Position < stream.Length)
                     {
                         wiki = (List<Information>)bin.Deserialize(stream);
                     }
                 }
             }
-            catch (IOException ex)
+            catch (System.InvalidCastException ex)
             {
                 var result = MessageBox.Show(ex.ToString(), "ERROR", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
-
         private void sortList()
         {
             string temp;
@@ -370,14 +350,10 @@ namespace DataApplication
                         wiki[y].setCategory(temp1);
                         wiki[y].setStructure(temp2);
                         wiki[y].setDefinition(temp3);
-
-
                     }
                 }
             }
         }
         #endregion
-
-
     }
 }
