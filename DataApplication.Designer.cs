@@ -1,6 +1,6 @@
 ﻿namespace DataApplication
 {
-    partial class Form1
+    partial class DataApplication
     {
         /// <summary>
         /// Required designer variable.
@@ -106,6 +106,7 @@
             this.textBoxName.Name = "textBoxName";
             this.textBoxName.Size = new System.Drawing.Size(108, 20);
             this.textBoxName.TabIndex = 8;
+            this.textBoxName.DoubleClick += new System.EventHandler(this.textBoxName_DoubleClick);
             // 
             // label1
             // 
@@ -189,6 +190,7 @@
             this.columnHeader1,
             this.columnHeader2});
             this.listView1.FullRowSelect = true;
+            this.listView1.HideSelection = false;
             this.listView1.Location = new System.Drawing.Point(197, 56);
             this.listView1.MultiSelect = false;
             this.listView1.Name = "listView1";
@@ -244,7 +246,7 @@
             this.toolStripStatusLabel1.Size = new System.Drawing.Size(12, 17);
             this.toolStripStatusLabel1.Text = "-";
             // 
-            // Form1
+            // DataApplication
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
@@ -266,7 +268,7 @@
             this.Controls.Add(this.buttonEdit);
             this.Controls.Add(this.buttonAdd);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
-            this.Name = "Form1";
+            this.Name = "DataApplication";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Data Application";
             this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.Form1_FormClosed);

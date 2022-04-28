@@ -4,6 +4,7 @@
 namespace DataApplication
 {
     [Serializable()]
+    // PR: 6.1 Create a separate class file to hold the four data items of the Data Structure
     class Information : IComparable<Information>
     {
         private string name;
