@@ -404,7 +404,5 @@ namespace DataApplication
             }
         }
         #endregion
-
-
     }
 }
