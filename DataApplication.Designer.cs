@@ -203,12 +203,12 @@
             // columnHeader1
             // 
             this.columnHeader1.Text = "Name";
-            this.columnHeader1.Width = 155;
+            this.columnHeader1.Width = 153;
             // 
             // columnHeader2
             // 
             this.columnHeader2.Text = "Category";
-            this.columnHeader2.Width = 155;
+            this.columnHeader2.Width = 153;
             // 
             // buttonSave
             // 
