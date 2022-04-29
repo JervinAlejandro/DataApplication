@@ -4,7 +4,6 @@ using System.IO;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Windows.Forms;
 
-// CR = Client Requirement
 // PR = Program Requirement
 
 // Jervin Alejandro
