@@ -1,8 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Drawing;
 using System.IO;
-using System.Runtime.Serialization.Formatters.Binary;
+using System.Text;
 using System.Windows.Forms;
 
 // PR = Program Requirement
@@ -33,12 +32,11 @@ namespace DataApplication
         string[] category = { "Array", "List", "Tree", "Graphs", "Abstract", "Hash" };
 
         #region FormLoad
-        // PR: 6.4 Create a custom method to populate the ComboBox when the Form Load method is called.
         private void Form1_Load(object sender, EventArgs e)
         {
-            comboBoxCategory.Items.AddRange(category);
+            populateComboBox();
             clearTextBox();
-            if(File.Exists("default.bin") == true)
+            if (File.Exists("default.bin") == true)
             {
                 open("default.bin");
                 var result = MessageBox.Show("Default.bin successfully loaded", "Information", MessageBoxButtons.OK, MessageBoxIcon.Information);
@@ -63,7 +61,7 @@ namespace DataApplication
                 var result = MessageBox.Show("Ensure that every attributes are filled", "ERROR", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 toolStripStatusLabel1.Text = "-";
             }
-            else if(validName(textBoxName.Text) == false)
+            else if (validName(textBoxName.Text) == false)
             {
                 var result = MessageBox.Show("Name already exist", "ERROR", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 toolStripStatusLabel1.Text = "-";
@@ -107,7 +105,7 @@ namespace DataApplication
                     display();
                 }
             }
-            catch(System.ArgumentOutOfRangeException)
+            catch (System.ArgumentOutOfRangeException)
             {
                 var result = MessageBox.Show("No data is selected", "ERROR", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 toolStripStatusLabel1.Text = "-";
@@ -137,9 +135,9 @@ namespace DataApplication
                     clearTextBox();
                 }
             }
-            catch(System.ArgumentOutOfRangeException)
+            catch (System.ArgumentOutOfRangeException)
             {
-                var result = MessageBox.Show("No data is selected", "ERROR", 
+                var result = MessageBox.Show("No data is selected", "ERROR",
                     MessageBoxButtons.OK, MessageBoxIcon.Error);
                 toolStripStatusLabel1.Text = "-";
             }
@@ -221,12 +219,46 @@ namespace DataApplication
         #endregion
 
         #region functions
+        // PR: 6.4 Create a custom method to populate the ComboBox when the Form Load method is called.
+        private void populateComboBox()
+        {
+            try
+            {
+                FileInfo t = new FileInfo("comboBox.txt");
+                StreamWriter text = t.CreateText();
+                foreach (var line in category)
+                {
+                    text.WriteLine(line);
+
+                }
+                text.Close();
+            }
+            catch (IOException ex)
+            {
+                var result = MessageBox.Show(ex.ToString(), "ERROR", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                toolStripStatusLabel1.Text = "-";
+            }
+
+            try
+            {
+                string[] read = File.ReadAllLines("comboBox.txt");
+                foreach (var line in read)
+                {
+                    string[] tokens = line.Split(',');
+                    comboBoxCategory.Items.Add(tokens[0]);
+                }
+            }
+            catch (IOException ex)
+            {
+                var result = MessageBox.Show(ex.ToString(), "ERROR", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
         private bool checkEmpty()
         {
             if (string.IsNullOrWhiteSpace(textBoxName.Text) ||
                 string.IsNullOrWhiteSpace(textBoxDefinition.Text) ||
                 string.IsNullOrWhiteSpace(comboBoxCategory.Text) ||
-                
+
                 (!radioButtonLinear.Checked && !radioButtonNonLinear.Checked))
             {
                 return true;
@@ -242,13 +274,13 @@ namespace DataApplication
         {
             sortList();
             listView1.Items.Clear();
-            foreach(var info in wiki)
+            foreach (var info in wiki)
             {
                 ListViewItem lvi = new ListViewItem(info.getName());
                 lvi.SubItems.Add(info.getCategory());
                 listView1.Items.Add(lvi);
             }
-            
+
         }
         private void sortList()
         {
@@ -282,7 +314,7 @@ namespace DataApplication
         }
         private void showTextBox(string text, int index)
         {
-            if(text == "set")
+            if (text == "set")
             {
                 wiki[index].setName(textBoxName.Text);
                 wiki[index].setCategory(comboBoxCategory.Text);
@@ -290,7 +322,7 @@ namespace DataApplication
                 wiki[index].setStructure(getRadioBox());
             }
 
-            if(text == "get")
+            if (text == "get")
             {
                 textBoxName.Text = wiki[index].getName();
                 comboBoxCategory.Text = wiki[index].getCategory();
@@ -361,7 +393,7 @@ namespace DataApplication
         // Use the built in List<T> method “Exists” to answer this requirement.
         private bool validName(string textBox)
         {
-            if(wiki.Exists(x => x.getName() == textBox))
+            if (wiki.Exists(x => x.getName() == textBox))
             {
                 return false;
             }
@@ -373,10 +405,18 @@ namespace DataApplication
         {
             try
             {
-                using (Stream stream = File.Open(saveName, FileMode.Create))
+                using (var stream = File.Open(saveName, FileMode.Create))
                 {
-                    BinaryFormatter bin = new BinaryFormatter();
-                    bin.Serialize(stream, wiki);
+                    using (var writer = new BinaryWriter(stream, Encoding.UTF8, false))
+                    {
+                        foreach (var item in wiki)
+                        {
+                            writer.Write(item.getName());
+                            writer.Write(item.getCategory());
+                            writer.Write(item.getStructure());
+                            writer.Write(item.getDefinition());
+                        }
+                    }
                 }
             }
             catch (IOException)
@@ -389,12 +429,27 @@ namespace DataApplication
         {
             try
             {
-                using (Stream stream = File.Open(openName, FileMode.Open))
+                using (var stream = File.Open(openName, FileMode.Open))
                 {
-                    BinaryFormatter bin = new BinaryFormatter();
-                    while (stream.Position < stream.Length)
+                    using (var reader = new BinaryReader(stream, Encoding.UTF8, false))
                     {
-                        wiki = (List<Information>)bin.Deserialize(stream);
+                        wiki.Clear();
+                        while (stream.Position < stream.Length)
+                        {
+                            try
+                            {
+                                Information readInfo = new Information();
+                                readInfo.setName(reader.ReadString());
+                                readInfo.setCategory(reader.ReadString());
+                                readInfo.setStructure(reader.ReadString());
+                                readInfo.setDefinition(reader.ReadString());
+                                wiki.Add(readInfo);
+                            }
+                            catch (IOException ex)
+                            {
+                                var result = MessageBox.Show(ex.ToString(), "ERROR", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                            }
+                        }
                     }
                 }
             }

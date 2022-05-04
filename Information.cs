@@ -16,33 +16,33 @@ namespace DataApplication
         {
             return name;
         }
-        public void setName (String name)
+        public void setName(String newName)
         {
-            this.name = name;
+            name = newName;
         }
         public string getCategory()
         {
             return category;
         }
-        public void setCategory(String category)
+        public void setCategory(String newCategory)
         {
-            this.category = category;
+            category = newCategory;
         }
         public string getStructure()
         {
             return structure;
         }
-        public void setStructure(String structure)
+        public void setStructure(String newStructure)
         {
-            this.structure = structure;
+            structure = newStructure;
         }
         public string getDefinition()
         {
             return definition;
         }
-        public void setDefinition(String definition)
+        public void setDefinition(String newDefinition)
         {
-            this.definition = definition;
+            definition = newDefinition;
         }
 
         public int CompareTo(Information other)
